@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .profile-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #00ff84;
+      border-radius: 20px;
+      padding: 40px;
+      width: 400px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0, 255, 132, 0.2);
+    }
+
+    .profile-card h2 {
+      color: #00ff84;
+      margin-bottom: 10px;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #00ff84;
+      margin-bottom: 15px;
+    }
+
+    .upload-btn {
+      background-color: #00ff84;
+      border: none;
+      color: black;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .upload-btn:hover {
+      background-color: #00cc55;
+    }
+
+    .profile-info {
+      margin: 15px 0;
+      line-height: 1.8;
+      text-align: left;
+    }
+
+    .points-box {
+      margin-top: 20px;
+      background: rgba(0, 255, 132, 0.1);
+      border-radius: 15px;
+      padding: 10px;
+      border: 1px solid #00ff84;
+    }
+
+    .back-btn {
+      margin-top: 30px;
+      text-decoration: none;
+      color: #00ff84;
+      border: 1px solid #00ff84;
+      border-radius: 20px;
+      padding: 8px 20px;
+      transition: 0.3s;
+      display: inline-block;
+    }
+
+    .back-btn:hover {
+      background-color: #00ff84;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-card">
+    <h2>{{ user.name }}</h2>
+
+    <!-- Profile picture section -->
+    <img id="profilePic" 
+         src="{{ url_for('static', filename='profile_pics/default-dp.png') }}" 
+         alt="Profile Picture" 
+         class="profile-pic" />
+
+    <br />
+    <input type="file" id="uploadPic" accept="image/*" style="display:none;" />
+    <button class="upload-btn" onclick="document.getElementById('uploadPic').click()">Change Photo</button>
+
+    <!-- Profile info -->
+    <div class="profile-info">
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Age:</strong> {{ user.age }}</p>
+    </div>
+
+    <!-- Points box -->
+    <div class="points-box">
+      <p><strong>Verified Images Uploaded:</strong> {{ verified_images }}</p>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back-btn">⬅ Back to Dashboard</a>
+  </div>
+
+  <script>
+    // Preview uploaded profile picture (client-side only)
+    document.getElementById("uploadPic").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById("profilePic").src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
+</html>

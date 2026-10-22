@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoFriendly Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background-color: #000;
+      color: white;
+      display: flex;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 40px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 20px 0;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: 0.3s;
+    }
+
+    .sidebar li:hover {
+      color: #00ff84;
+      opacity: 1;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      background: rgba(0, 255, 132, 0.15);
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .profile-icon {
+      background-color: #00ff84;
+      color: black;
+      font-weight: bold;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+
+    .profile-text span {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      position: relative;
+    }
+
+    header {
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .rank {
+      position: absolute;
+      top: 40px;
+      right: 60px;
+      color: #aaa;
+    }
+
+    .rank span {
+      color: #00ff84;
+    }
+
+    .dashboard {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 20px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .glass {
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Central Reward Circle */
+    .progress-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .progress-circle {
+      position: relative;
+      width: 200px;
+      height: 200px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .bg {
+      fill: none;
+      stroke: #222;
+      stroke-width: 3.8;
+    }
+
+    .progress {
+      fill: none;
+      stroke: #00ff84;
+      stroke-width: 3.8;
+      stroke-linecap: round;
+      transition: stroke-dasharray 1s ease;
+    }
+
+    .percentage {
+      fill: #fff;
+      font-size: 10px;
+      text-anchor: middle;
+    }
+
+    /* Buttons */
+    button, a {
+      cursor: pointer;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .filled {
+      background-color: #00ff84;
+      color: black;
+    }
+
+    .outline {
+      background-color: transparent;
+      color: #00ff84;
+      border: 1px solid #00ff84;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 30px;
+      padding: 10px 20px;
+      width: 50%;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-bar input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .search-bar button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <h2 class="logo">EcoFriendly</h2>
+      <ul>
+        <li><a href="{{ url_for('action_update') }}" style="color:white; text-decoration:none;"><b>Action Update</b></a></li><br>
+        <li><a href="{{ url_for('community') }}" style="color:white; text-decoration:none;"><b>Communities</b></a></li><br>
+        <li><a href="{{ url_for('games') }}" style="color:white; text-decoration:none;"><b>Games</b></a></li><br>
+        <li><a href="{{ url_for('leader_board') }}" style="color:white; text-decoration:none;"><b>LeaderBoard</b></a></li><br>
+      </ul>
+      <a href="{{ url_for('profile') }}" style="text-decoration:none; color:inherit;">
+        <div class="profile">
+          <div class="profile-icon">K</div>
+          <div class="profile-text">
+            <p><strong>Profile</strong></p>
+            <span>View account</span>
+          </div>
+        </div>
+      </a>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <header>
+        <h1>Hello, <span id="username">Keerthan</span> 👋</h1>
+        <p>Welcome back — here's your community dashboard</p>
+        <p class="rank">Community Rank: <span>#12</span></p>
+      </header>
+
+      <!-- Dashboard Section (Highlights + Rewards) -->
+      <section class="dashboard">
+        <!-- 🟢 Community Highlights -->
+        <div class="card glass" style="flex: 1; text-align: left;">
+          <h3>🌍 Community Highlights</h3>
+          <ul id="communityHighlights" style="margin-top: 15px; line-height: 1.8; list-style: none; padding-left: 0;">
+            <li>♻️ <strong>Green Warriors</strong> planted 200 trees this week!</li>
+            <li>💧 <strong>Eco Champs</strong> reduced water waste by 15%.</li>
+            <li>🌞 <strong>Solar Savers</strong> powered 50 homes sustainably.</li>
+            <li>🪴 <strong>Clean Earth Crew</strong> organized 3 recycling drives.</li>
+          </ul>
+        </div>
+
+        <!-- 🏆 Rewards Section -->
+        <div class="card glass">
+          <h3>Rewards — Circular Ring</h3>
+          <div class="progress-container">
+            <div class="progress-circle">
+              <svg viewBox="0 0 36 36">
+                <path class="bg"
+                  d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831a15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="progress"
+                  stroke-dasharray="0, 100"
+                  d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831a15.9155 15.9155 0 0 1 0 -31.831" />
+                <text x="18" y="20.35" class="percentage">{{ points }} pts</text>
+              </svg>
+            </div>
+          </div>
+          <p>Points</p>
+          <span>Your weekly progress</span>
+        </div>
+      </section>
+
+      <!-- Display Answer -->
+      {% if answer %}
+      <div class="glass" style="margin: 20px 0; padding: 15px; border-radius: 15px;">
+        <strong>You asked:</strong> {{ user_question }}<br>
+        <strong>Answer:</strong> {{ answer }}
+      </div>
+      {% endif %}
+
+      <!-- Search Bar --> 
+      <div class="search-bar glass"> 
+      <form class="search-bar glass" action="{{ url_for('ask_question') }}" method="POST"> 
+        <input type="text" name="question" placeholder="Ask anything..." required /> 
+        <button type="submit" class="filled">Ask</button> 
+      </form> 
+    </div> 
+  </main> 
+</div>
+
+  <!-- Thinking Animation -->
+  <script>
+    const form = document.querySelector('.search-bar form');
+    form.addEventListener('submit', function(event) {
+      const thinkingBox = document.createElement('div');
+      thinkingBox.innerText = "🤔 Thinking about your question...";
+      thinkingBox.style.position = "fixed";
+      thinkingBox.style.bottom = "100px";
+      thinkingBox.style.left = "50%";
+      thinkingBox.style.transform = "translateX(-50%)";
+      thinkingBox.style.background = "rgba(255,255,255,0.1)";
+      thinkingBox.style.padding = "10px 20px";
+      thinkingBox.style.borderRadius = "15px";
+      thinkingBox.style.backdropFilter = "blur(10px)";
+      thinkingBox.style.color = "#00ff84";
+      thinkingBox.style.fontWeight = "bold";
+      document.body.appendChild(thinkingBox);
+    });
+  </script>
+
+  <!-- Points Animation -->
+  <script>
+    fetch("{{ url_for('get_points') }}")
+      .then(response => response.json())
+      .then(data => {
+        const points = data.points || 0;
+        const percentage = Math.min(points, 100);
+        const progressPath = document.querySelector('.progress');
+        const percentageText = document.querySelector('.percentage');
+        let current = 0;
+        const step = 1;
+        const interval = setInterval(() => {
+          if (current >= percentage) {
+            clearInterval(interval);
+          } else {
+            current += step;
+            progressPath.setAttribute('stroke-dasharray', `${current}, 100`);
+            percentageText.textContent = `${current} pts`;
+          }
+        }, 20);
+      })
+      .catch(() => console.error("Failed to fetch points."));
+  </script>
+</body>
+</html>

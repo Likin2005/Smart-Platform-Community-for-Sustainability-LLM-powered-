@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Action Update</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      color: #00ff84;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #00ff84;
+      border-radius: 40px;
+      padding: 10px 20px;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    .search-container input[type="file"] {
+      display: none;
+    }
+
+    .upload-label {
+      color: #00ff84;
+      background-color: transparent;
+      border: 1px solid #00ff84;
+      border-radius: 20px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-label:hover {
+      background-color: #00ff84;
+      color: #000;
+    }
+
+    .search-container button {
+      background-color: #00ff84;
+      border: none;
+      color: #000;
+      border-radius: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .search-container button:hover {
+      background-color: #00cc66;
+    }
+
+    .image-preview {
+      margin-top: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 255, 132, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      padding: 15px;
+      display: none;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+
+    .back-btn {
+      position: absolute;
+      bottom: 40px;
+      background-color: transparent;
+      color: #00ff84;
+      border: 1px solid #00ff84;
+      border-radius: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background-color: #00ff84;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Action Update</h1>
+
+  <form
+    class="search-container"
+    action="{{ url_for('verify_image') }}"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    <label for="imageUpload" class="upload-label">📁 Upload</label>
+    <input type="file" id="imageUpload" name="image" accept="image/*" required />
+    <button type="submit">Verify</button>
+  </form>
+
+  <div id="previewContainer" class="image-preview">
+    <p>📸 Image Preview:</p>
+    <img id="previewImage" src="" alt="Preview" />
+  </div>
+
+  {% if image_result %}
+  <div class="image-preview" style="display:block; border:1px solid #00ff84; margin-top:20px;">
+    <h3>🔍 Result:</h3>
+    <p>{{ image_result }}</p>
+    <div id="points-container">
+      <p>Points: {{ points }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <a class="back-btn" href="{{ url_for('index') }}">⬅ Back to Main</a>
+
+  <script>
+    const imageUpload = document.getElementById('imageUpload');
+    const uploadLabel = document.querySelector('.upload-label');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+
+    imageUpload.addEventListener('change', () => {
+      const file = imageUpload.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImage.src = e.target.result;
+          previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+
+        const fileName = file.name.length > 15 ? file.name.slice(0, 15) + '...' : file.name;
+        uploadLabel.textContent = fileName;
+      } else {
+        previewContainer.style.display = 'none';
+        uploadLabel.textContent = '📁 Upload';
+      }
+    });
+  </script>
+</body>
+</html>

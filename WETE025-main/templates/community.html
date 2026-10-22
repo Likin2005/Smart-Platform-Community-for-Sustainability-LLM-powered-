@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background-color: #00ff88;
+      color: black;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .post-box {
+      width: 90%;
+      max-width: 700px;
+      margin-top: 80px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .post-btn {
+      background: #00ff88;
+      color: black;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .post {
+      width: 90%;
+      max-width: 700px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .post img {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .like-comment {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .like-comment button {
+      background: #00ff88;
+      border: none;
+      border-radius: 20px;
+      color: black;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .like-comment button:hover {
+      background: #00cc66;
+    }
+
+    .comment-box {
+      margin-top: 10px;
+    }
+
+    .comment {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 6px 10px;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-btn" href="{{ url_for('index') }}">← Back</a>
+
+  <div class="post-box">
+    <h2>Share Your Eco-Friendly Work 🌱</h2>
+    <form id="postForm">
+      <label for="verifiedImages">Choose from verified images:</label>
+      <select id="verifiedImages" required>
+        <option value="">-- Select an image --</option>
+        {% for img in images %}
+          <option value="{{ img }}">{{ img.split('/')[-1] }}</option>
+        {% endfor %}
+      </select>
+
+      <textarea id="caption" placeholder="Write about your eco-friendly experience..."></textarea>
+      <button type="submit" class="post-btn">Post</button>
+    </form>
+  </div>
+
+  <div id="posts"></div>
+
+  <script>
+    const form = document.getElementById("postForm");
+    const postsDiv = document.getElementById("posts");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const selectedImage = document.getElementById("verifiedImages").value;
+      const caption = document.getElementById("caption").value.trim();
+
+      if (!selectedImage) return alert("Please select a verified image.");
+
+      const post = document.createElement("div");
+      post.className = "post";
+      post.innerHTML = `
+        <h3>You</h3>
+        <p>${caption || "No caption provided."}</p>
+        <img src="${selectedImage}" alt="Post">
+        <p>✅ Verified eco-action</p>
+        <div class="like-comment">
+          <button onclick="likePost(this)">👍 Like <span class='like-count'>0</span></button>
+          <button onclick="commentPost(this)">💬 Comment</button>
+        </div>
+        <div class="comment-box"></div>
+      `;
+      postsDiv.prepend(post);
+      form.reset();
+
+      // Award points server-side
+      fetch("{{ url_for('community_post') }}", { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          const note = document.createElement('div');
+          note.textContent = "+2 points added! Total: " + (data.points ?? '');
+          note.style.position = 'fixed';
+          note.style.top = '20px';
+          note.style.right = '20px';
+          note.style.background = '#00ff88';
+          note.style.color = '#000';
+          note.style.padding = '8px 12px';
+          note.style.borderRadius = '12px';
+          note.style.fontWeight = 'bold';
+          document.body.appendChild(note);
+          setTimeout(() => note.remove(), 2000);
+        })
+        .catch(() => {});
+    });
+
+    function likePost(btn) {
+      const countSpan = btn.querySelector(".like-count");
+      let count = parseInt(countSpan.textContent);
+      count++;
+      countSpan.textContent = count;
+      btn.disabled = true;
+      btn.textContent = `❤️ Liked ${count}`;
+    }
+
+    function commentPost(btn) {
+      const commentText = prompt("Enter your comment:");
+      if (commentText) {
+        const postDiv = btn.closest(".post");
+        const commentBox = postDiv.querySelector(".comment-box");
+        const commentDiv = document.createElement("div");
+        commentDiv.className = "comment";
+        commentDiv.textContent = commentText;
+        commentBox.appendChild(commentDiv);
+      }
+    }
+  </script>
+</body>
+</html>

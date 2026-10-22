@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QuickQuiz — Circular Economy (100 Qs)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Quiz on waste segregation, water & energy reuse, repair/refurbish, food waste reduction, and community participation." />
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+  <main class="w-full max-w-4xl">
+    <section id="app" class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <header class="flex items-center justify-between p-6 border-b">
+        <h1 class="text-2xl font-semibold">QuickQuiz — Circular Economy</h1>
+        <div class="text-right">
+          <div class="text-sm text-gray-500">Score</div>
+          <div id="score" class="text-lg font-medium">0</div>
+        </div>
+      </header>
+
+      <section class="p-6">
+        <div id="start-screen" class="space-y-4">
+          <p class="text-gray-600">This quiz contains 100 multiple-choice questions across five focus areas. Each play randomly selects 10 questions. Questions are simple factual awareness items ("Which waste type is recyclable?").</p>
+          <div class="flex gap-3">
+            <button id="btn-start" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Start Quiz (10 random)</button>
+            <button id="btn-leaderboard" class="px-4 py-2 border rounded-lg">Leaderboard</button>
+            <button id="btn-showall" class="px-4 py-2 border rounded-lg">Show All Questions</button>
+          </div>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-sm text-gray-600">Question <span id="q-index">1</span> / <span id="q-count">10</span></div>
+            <div class="text-sm text-gray-600">Time left: <span id="time-left">--</span>s</div>
+          </div>
+
+          <article class="mb-6">
+            <h2 id="question" class="text-xl font-semibold mb-3">Question text</h2>
+            <div id="choices" class="grid gap-3"></div>
+          </article>
+
+          <div class="flex items-center justify-between">
+            <button id="btn-prev" class="px-4 py-2 border rounded-lg" disabled>Previous</button>
+            <div class="flex items-center gap-3">
+              <button id="btn-next" class="px-4 py-2 bg-green-600 text-white rounded-lg">Next</button>
+              <button id="btn-finish" class="px-4 py-2 bg-red-600 text-white rounded-lg">Finish</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="result-screen" class="hidden text-center py-8">
+          <h3 class="text-2xl font-bold mb-2">Quiz Completed!</h3>
+          <p class="text-gray-700 mb-4">You scored <span id="final-score">0</span> / <span id="max-score">0</span></p>
+          <div class="flex items-center justify-center gap-3 mb-4">
+            <input id="name" type="text" placeholder="Enter your name" class="px-3 py-2 border rounded-lg" />
+            <button id="save-score" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Save to Leaderboard</button>
+          </div>
+          <div class="flex items-center justify-center gap-3">
+            <button id="btn-restart" class="px-4 py-2 border rounded-lg">Play Again</button>
+            <button id="btn-home" class="px-4 py-2 border rounded-lg">Home</button>
+          </div>
+        </div>
+
+        <div id="leaderboard-screen" class="hidden">
+          <h3 class="text-lg font-semibold mb-3">Leaderboard</h3>
+          <ol id="leaderboard" class="list-decimal list-inside space-y-2 text-gray-700"></ol>
+          <div class="mt-4 flex gap-3">
+            <button id="clear-leaderboard" class="px-3 py-2 border rounded-lg">Clear</button>
+            <button id="btn-back" class="px-3 py-2 border rounded-lg">Back</button>
+          </div>
+        </div>
+
+        <div id="all-questions-screen" class="hidden">
+          <h3 class="text-lg font-semibold mb-3">All Questions (100)</h3>
+          <ol id="all-questions" class="list-decimal list-inside space-y-2 text-gray-700"></ol>
+          <div class="mt-4">
+            <button id="btn-all-back" class="px-3 py-2 border rounded-lg">Back</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="p-4 text-sm text-gray-500 border-t text-center">Made with ❤️ — QuickQuiz demo</footer>
+    </section>
+    <p class="mt-4 text-xs text-gray-500">Save as <code>quiz.html</code> and open in a browser.</p>
+  </main>
+
+<script>
+// ---------------------- Question bank (100 questions; 20 per focus area) ----------------------
+const QUESTIONS = [
+  // Waste segregation & recycling (1-20)
+  { id:1, q: "Which waste type is recyclable in most curbside programs?", choices: ["Food scraps","Plastic bottles","Used tissues","Ceramic plates"], answer: 1 },
+  { id:2, q: "Which material should go into the paper recycling bin?", choices: ["Greasy pizza boxes","Newspapers","Wet cardboard with food","Used diapers"], answer: 1 },
+  { id:3, q: "Which plastic is commonly accepted for recycling?", choices: ["Plastic bags","#1 PET bottles","Styrofoam cups","PVC pipes"], answer: 1 },
+  { id:4, q: "Which item is usually NOT recyclable?", choices: ["Glass jars","Aluminum cans","Food-contaminated pizza box","Steel cans"], answer: 2 },
+  { id:5, q: "Which of these is considered e-waste?", choices: ["Plastic bottle","Old mobile phone","Paper bag","Apple core"], answer: 1 },
+  { id:6, q: "Where should empty aerosol cans typically go?", choices: ["Recycling (if empty)","Compost","Landfill only","Hazardous waste only"], answer: 0 },
+  { id:7, q: "Which container should glass bottles go into?", choices: ["Plastic bin","Glass recycling","Food waste","Metal bin"], answer: 1 },
+  { id:8, q: "Aluminum foil should be placed in recycling if it is:", choices: ["Clean and dry","Heavily soiled","Attached to food","None of the above"], answer: 0 },
+  { id:9, q: "Which of these plastics is often NOT accepted in curbside recycling?", choices: ["PET (#1)","HDPE (#2)","Polystyrene (foam)","PP (#5)"], answer: 2 },
+  { id:10, q: "Which is an example of source segregation?", choices: ["Mixing all waste","Separating wet and dry waste","Burning garbage","Dumping in open area"], answer: 1 },
+  { id:11, q: "Which item belongs in organic/compost bin?", choices: ["Banana peel","Glass bottle","Plastic cup","Battery"], answer: 0 },
+  { id:12, q: "Tin cans should be cleaned and placed in which bin?", choices: ["Glass","Plastic","Metal recycling","Compost"], answer: 2 },
+  { id:13, q: "Which step helps improve recycling quality?", choices: ["Rinsing containers","Tearing paper into tiny pieces","Mixing materials","Throwing recyclables in plastic bags"], answer: 0 },
+  { id:14, q: "Which of these is a recyclable textile item?", choices: ["Old cotton t-shirt","Wet stained mattress","Used sanitary pad","Plastic-coated fabric"], answer: 0 },
+  { id:15, q: "Which symbol on a plastic item indicates it can be recycled?", choices: ["Mobius loop","Flammable sign","CE mark","Barcode"], answer: 0 },
+  { id:16, q: "Glass items should be sorted by:", choices: ["Color where required","Size","Brand","Price"], answer: 0 },
+  { id:17, q: "Which is an example of hazardous household waste?", choices: ["Paint cans","Paper napkins","Glass bottles","Cardboard"], answer: 0 },
+  { id:18, q: "Used cooking oil should be:", choices: ["Poured down sink","Collected separately for recycling","Mixed with plastics","Burnt"], answer: 1 },
+  { id:19, q: "Which action reduces contamination in recycling?", choices: ["Flattening boxes and rinsing","Leaving food inside containers","Putting recyclables in plastic bags","Mixing paper and food waste"], answer: 0 },
+  { id:20, q: "Battery disposal should be done via:", choices: ["Regular trash","Recycling/collection points","Compost bin","Street drain"], answer: 1 },
+
+  // Water & energy reuse (21-40)
+  { id:21, q: "Which practice helps conserve water at home?", choices: ["Letting taps run","Fixing leaks promptly","Washing car with hose always","Ignoring drips"], answer: 1 },
+  { id:22, q: "Greywater is best described as:", choices: ["Dirty sewage water","Relatively clean wastewater from baths/sinks","Drinking water","Industrial chemical waste"], answer: 1 },
+  { id:23, q: "Which appliance saves water compared to hand washing dishes?", choices: ["Efficient dishwasher","Garden hose","Pressure washer","Open drain"], answer: 0 },
+  { id:24, q: "Rainwater harvesting is used to:", choices: ["Increase flooding","Collect and store rain for reuse","Pollute groundwater","Waste water"], answer: 1 },
+  { id:25, q: "Which lighting choice saves energy?", choices: ["Incandescent bulbs","LED bulbs","Halogen bulbs","Leaving lights on"], answer: 1 },
+  { id:26, q: "Which is a good way to reuse water?", choices: ["Using washing machine effluent for irrigation (if safe)","Drinking greywater","Pouring motor oil in sink","Flushing without water"], answer: 0 },
+  { id:27, q: "Solar panels help by:", choices: ["Producing renewable electricity","Using more fossil fuels","Increasing water waste","Emitting toxic waste"], answer: 0 },
+  { id:28, q: "Which device reduces water flow while keeping pressure?", choices: ["Low-flow faucet aerator","Open nozzle","Wider pipe","Leaky valve"], answer: 0 },
+  { id:29, q: "Which reduces household energy use most?", choices: ["Insulating walls and roofs","Leaving windows open in winter","Keeping all lights on","Using old inefficient appliances"], answer: 0 },
+  { id:30, q: "Which practice helps energy reuse in buildings?", choices: ["Heat recovery ventilation","Blocking airflow","Turning off insulation","Breaking windows"], answer: 0 },
+  { id:31, q: "Which is a common source of greywater?", choices: ["Toilet flush","Bath and shower drains","Industrial effluent","Ocean water"], answer: 1 },
+  { id:32, q: "Water-efficient toilets help by:", choices: ["Using more water per flush","Reducing water used per flush","Recycling sewage instantly","Contaminating groundwater"], answer: 1 },
+  { id:33, q: "Which is a method to reduce energy waste?", choices: ["Smart thermostats","Leaving appliances on standby","Using old refrigerators","Wasting heat"], answer: 0 },
+  { id:34, q: "Drip irrigation is useful because it:", choices: ["Wastes water quickly","Delivers water directly to roots efficiently","Floods fields","Increases evaporation"], answer: 1 },
+  { id:35, q: "Which is a renewable energy source?", choices: ["Coal","Natural gas","Wind","Coal ash"], answer: 2 },
+  { id:36, q: "Which can help households reuse energy?", choices: ["Solar water heaters","Open-air heaters","Uninsulated windows","Coal stoves"], answer: 0 },
+  { id:37, q: "Which reduces water loss in supply systems?", choices: ["Fixing pipe leaks","Ignoring maintenance","Opening valves randomly","Letting pipes burst"], answer: 0 },
+  { id:38, q: "Which action conserves both water and energy?", choices: ["Long showers","Cold wash cycles and full loads","Running half-empty dishwasher","Frequent laundry"], answer: 1 },
+  { id:39, q: "Which practice helps in industrial water reuse?", choices: ["Treating and recycling process water","Dumping untreated effluent","Using freshwater only","Mixing waste streams"], answer: 0 },
+  { id:40, q: "Which meter helps track energy consumption?", choices: ["Smart meter","Paper bill only","Analog clock","Non-smart thermostat"], answer: 0 },
+
+  // Product repair/refurbish platforms (41-60)
+  { id:41, q: "Repair cafes and platforms primarily promote:", choices: ["Throwaway culture","Repair and reuse of products","Burning old items","Importing new goods"], answer: 1 },
+  { id:42, q: "Which item is commonly refurbished?", choices: ["Laptop","Fresh fruit","Paper napkins","Soiled mattress"], answer: 0 },
+  { id:43, q: "Which action extends product life?", choices: ["Regular maintenance","Neglect","Intentional breakage","Ignoring damage"], answer: 0 },
+  { id:44, q: "Which platform feature helps match repair skills to items?", choices: ["Search and listing of repairers","Deleting listings","Hiding repair details","Blocking communication"], answer: 0 },
+  { id:45, q: "Refurbished electronics are typically:", choices: ["Thoroughly tested and repaired","Always brand new","Not inspected","Intentionally damaged"], answer: 0 },
+  { id:46, q: "Which is a sustainable option for broken furniture?", choices: ["Repair or refurbish","Dump in river","Burn it","Send to landfill without checking"], answer: 0 },
+  { id:47, q: "Which reduces e-waste?", choices: ["Buying repairable products","Buying sealed unrepairable ones","Throwing away immediately","Never fixing"], answer: 0 },
+  { id:48, q: "Which helps users find spare parts?", choices: ["Parts marketplace","Ignoring the model number","Wrong-fit parts","Discarding manuals"], answer: 0 },
+  { id:49, q: "Which business model supports refurbishment?", choices: ["Product-as-a-service","Planned obsolescence","Single-use sales","Disposable rentals"], answer: 0 },
+  { id:50, q: "Which material is often repaired rather than replaced?", choices: ["Wood furniture","Single-use plastic","Wet paper","Used diapers"], answer: 0 },
+  { id:51, q: "Which professional can help refurbish electronics?", choices: ["Electronics technician","Greengrocer","Carpenter (only)","Chef"], answer: 0 },
+  { id:52, q: "Which indicates a quality refurbished product?", choices: ["Warranty and testing","No inspection","No documentation","Random parts"], answer: 0 },
+  { id:53, q: "Which is encouraged on repair platforms?", choices: ["Sharing repair guides","Hiding instructions","Discouraging repair","Selling only new items"], answer: 0 },
+  { id:54, q: "Which item is least suitable for refurbishment?", choices: ["Single-use plastic packaging","Wooden table","Lamp","Bicycle"], answer: 0 },
+  { id:55, q: "Which action supports circularity in electronics?", choices: ["Modular design for repair","Sealed unserviceable devices","Glue-only assembly","Proprietary screws only"], answer: 0 },
+  { id:56, q: "Which platform helps trade used but working items?", choices: ["Peer-to-peer marketplaces","Illegal dumping","Burning sites","Discard forums"], answer: 0 },
+  { id:57, q: "Which encourages product longevity?", choices: ["User-replaceable parts","Unrepairable design","Limited documentation","Intentional degradation"], answer: 0 },
+  { id:58, q: "Which certification might indicate a responsibly refurbished device?", choices: ["Refurbished with warranty","No quality checks","Sold as broken","No return policy"], answer: 0 },
+  { id:59, q: "Which feature helps users learn DIY repairs?", choices: ["Step-by-step guides and videos","No instructions","Hidden schematics","Paid-only secrets"], answer: 0 },
+  { id:60, q: "Which reduces shipping waste for repairs?", choices: ["Local repair hubs","Shipping to distant centers unnecessarily","Single global center only","Returning items to landfill"], answer: 0 },
+
+  // Food waste reduction & composting (61-80)
+  { id:61, q: "Which of these is a good way to reduce food waste at home?", choices: ["Planning meals and portions","Buying impulsively in bulk constantly","Throwing leftovers","Ignoring expiry dates"], answer: 0 },
+  { id:62, q: "Which kitchen practice aids composting?", choices: ["Separating fruit and vegetable scraps","Putting plastics in compost","Adding metals","Adding glass"], answer: 0 },
+  { id:63, q: "Which food is compostable?", choices: ["Vegetable peels","Plastic wrap","Styrofoam","Engine oil"], answer: 0 },
+  { id:64, q: "Which should NOT go into home compost?", choices: ["Meat and dairy in small systems","Vegetable scraps","Coffee grounds","Eggshells"], answer: 0 },
+  { id:65, q: "Which reduces waste in restaurants?", choices: ["Portion control and donating surplus","Overproduction","Discarding perfectly good food","Single-use excessive servings"], answer: 0 },
+  { id:66, q: "Which is a food sharing option to prevent waste?", choices: ["Food rescue and donation","Dumping excess food","Hoarding unused food","Burning leftovers"], answer: 0 },
+  { id:67, q: "Which item speeds up composting?", choices: ["Chopped green waste and brown materials mix","Adding plastics","Adding glass","Adding metal"], answer: 0 },
+  { id:68, q: "Which packaging reduces food waste?", choices: ["Resealable packaging and portioned packs","Non- resealable oversized packs","Broken packaging","Excessive single-use wrapping"], answer: 0 },
+  { id:69, q: "Which action helps reduce household food waste?", choices: ["Storing food properly and using FIFO","Leaving food uncovered","Ignoring fridge temperatures","Random storage"], answer: 0 },
+  { id:70, q: "Which food waste is suitable for industrial composting but not small home bins?", choices: ["Large quantities of meat and bones","Vegetable peels","Tea bags","Paper towel"], answer: 0 },
+  { id:71, q: "Which preservation method reduces food spoilage?", choices: ["Refrigeration and canning","Leaving food at room temperature","Sun-baking without protection","Storing with pests"], answer: 0 },
+  { id:72, q: "Which household item is a good compost additive?", choices: ["Coffee grounds","Plastic containers","Ceramics","Glass jars"], answer: 0 },
+  { id:73, q: "Which reduces food waste in supply chains?", choices: ["Improved storage and cold chain","Ignoring storage","Delaying transport","Poor handling"], answer: 0 },
+  { id:74, q: "Which action helps reduce plate waste?", choices: ["Smaller default portions and option to add more","Serving huge portions by default","Not offering portion choices","Forcing large plates"], answer: 0 },
+  { id:75, q: "Which is a compostable packaging material?", choices: ["Paper-based compostable trays","Polystyrene foam","PVC film","Metal foil"], answer: 0 },
+  { id:76, q: "Which farm practice reduces post-harvest losses?", choices: ["Proper drying and storage","Leaving harvest exposed","Immediate dumping","No grading"], answer: 0 },
+  { id:77, q: "Which helps households rediscover leftovers?", choices: ["Meal-planning apps and labels","Ignoring leftovers","Hiding food","Throwing away first"], answer: 0 },
+  { id:78, q: "Which ingredient is often used to balance compost mix?", choices: ["Dry leaves (brown matter)","Plastic bags","Glass shards","Motor oil"], answer: 0 },
+  { id:79, q: "Which reduces food waste during transport?", choices: ["Cooled containers and better logistics","Random transport","No insulation","Open trucks"], answer: 0 },
+  { id:80, q: "Which is a simple way to compost in apartments?", choices: ["Bokashi or small vermicompost bins","Large outdoor windrows only","Dumping in sink","Burning food"], answer: 0 },
+
+  // Community participation apps (81-100)
+  { id:81, q: "Community participation apps commonly help by:", choices: ["Reporting local issues and organizing actions","Isolating community members","Encouraging littering","Blocking communication"], answer: 0 },
+  { id:82, q: "Which feature helps in a neighborhood recycling app?", choices: ["Pickup scheduling and drop-off locations","Confusing menus","No contact info","Empty maps"], answer: 0 },
+  { id:83, q: "Which app feature encourages compost sharing?", choices: ["Listing surplus compost and pickup times","Hiding availability","Blocking users","No scheduling"], answer: 0 },
+  { id:84, q: "Which action can community apps promote?", choices: ["Local repair meetups","Avoiding repairs","Illegal dumping","Discarding useful items"], answer: 0 },
+  { id:85, q: "Which helps citizens participate in local circular initiatives?", choices: ["Event sign-ups and volunteer coordination","No notifications","No calendar","No direction"], answer: 0 },
+  { id:86, q: "Which function supports sharing of tools and items?", choices: ["Peer lending lists","Forced purchases","No listings","Only sale ads"], answer: 0 },
+  { id:87, q: "Which helps track neighborhood energy savings?", choices: ["Aggregated dashboards and tips","Random data","No metrics","Useless charts"], answer: 0 },
+  { id:88, q: "Which encourages community composting?", choices: ["Shared compost hubs and pickup schedules","Private hoarding","Discarding food","No coordination"], answer: 0 },
+  { id:89, q: "Which notification is useful in participation apps?", choices: ["Local collection events and rules","Spam unrelated offers","Irrelevant alerts","Too many ads"], answer: 0 },
+  { id:90, q: "Which helps match volunteers to tasks?", choices: ["Skill-based signups and filters","Random assignment","No matching","Only paid roles"], answer: 0 },
+  { id:91, q: "Which feature increases trust in a community platform?", choices: ["Verified profiles and reviews","Anonymous scammers","No profiles","Fake listings"], answer: 0 },
+  { id:92, q: "Which helps reduce local waste via app?", choices: ["Swap and giveaway sections","Delete reuse options","Promote single-use purchases","Remove categories"], answer: 0 },
+  { id:93, q: "Which metric can apps show to motivate users?", choices: ["Waste diverted from landfill","Number of successful repairs","Amount of compost shared","All of the above"], answer: 3 },
+  { id:94, q: "Which supports accessibility in community apps?", choices: ["Multi-language support and simple UI","Complex text-only interfaces","Hidden menus","Confusing color schemes"], answer: 0 },
+  { id:95, q: "Which activity helps build community around repair?", choices: ["Organized repair events and tutorials","Keeping repair knowledge private","Hiding tools","Discouraging participation"], answer: 0 },
+  { id:96, q: "Which improves response to local recycling questions?", choices: ["Local knowledge base and FAQs","No information","Generic national rules only","No search"], answer: 0 },
+  { id:97, q: "Which feature encourages reporting illegal dumping?", choices: ["Anonymous reporting with photo upload","No reporting option","Only email complaints","No evidence allowed"], answer: 0 },
+  { id:98, q: "Which helps coordinate local donations?", choices: ["Pickup scheduling and recipient matching","Random drop-offs","No recipient info","Unsafe exchanges"], answer: 0 },
+  { id:99, q: "Which lets users learn about local recycling rules?", choices: ["Interactive guides based on postcode","No location-specific info","Generic wrong rules","Hidden policies"], answer: 0 },
+  { id:100, q: "Which helps track neighborhood repair successes?", choices: ["Public logs of repaired items and contributors","Keeping everything private","No logs","Deleting history"], answer: 0 }
+];
+
+// ---------------------- App state ----------------------
+let masterQuestions = [...QUESTIONS];
+let quizQuestions = []; // will hold 10 random questions
+let currentIndex = 0;
+let score = 0;
+let userAnswers = {};
+let timerInterval = null;
+let timePerQuestion = 20;
+let timeLeft = timePerQuestion;
+
+// ---------------------- DOM ----------------------
+const startScreen = document.getElementById('start-screen');
+const quizScreen = document.getElementById('quiz-screen');
+const resultScreen = document.getElementById('result-screen');
+const leaderboardScreen = document.getElementById('leaderboard-screen');
+const allQuestionsScreen = document.getElementById('all-questions-screen');
+
+const btnStart = document.getElementById('btn-start');
+const btnLeaderboard = document.getElementById('btn-leaderboard');
+const btnShowAll = document.getElementById('btn-showall');
+
+const qIndexEl = document.getElementById('q-index');
+const qCountEl = document.getElementById('q-count');
+const questionEl = document.getElementById('question');
+const choicesEl = document.getElementById('choices');
+const scoreEl = document.getElementById('score');
+const timeLeftEl = document.getElementById('time-left');
+
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const btnFinish = document.getElementById('btn-finish');
+
+const finalScoreEl = document.getElementById('final-score');
+const maxScoreEl = document.getElementById('max-score');
+const nameInput = document.getElementById('name');
+const btnSaveScore = document.getElementById('save-score');
+const btnRestart = document.getElementById('btn-restart');
+const btnHome = document.getElementById('btn-home');
+
+const leaderboardList = document.getElementById('leaderboard');
+const btnClearLeaderboard = document.getElementById('clear-leaderboard');
+const btnBack = document.getElementById('btn-back');
+const allQuestionsList = document.getElementById('all-questions');
+const btnAllBack = document.getElementById('btn-all-back');
+
+// ---------------------- Helpers ----------------------
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function pickRandomTen() {
+  const copy = [...masterQuestions];
+  shuffle(copy);
+  return copy.slice(0, 10);
+}
+
+function saveLeaderboard(entry) {
+  const stored = JSON.parse(localStorage.getItem('quickquiz_leaderboard') || '[]');
+  stored.push(entry);
+  stored.sort((a,b) => b.score - a.score);
+  localStorage.setItem('quickquiz_leaderboard', JSON.stringify(stored.slice(0, 10)));
+}
+
+function loadLeaderboard() {
+  return JSON.parse(localStorage.getItem('quickquiz_leaderboard') || '[]');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>\\\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\\\"':'&quot;',"'":"&#39;"}[c]));
+}
+
+// ---------------------- Quiz flow ----------------------
+function startQuiz() {
+  score = 0;
+  userAnswers = {};
+  currentIndex = 0;
+  timeLeft = timePerQuestion;
+  quizQuestions = pickRandomTen();
+  qCountEl.textContent = quizQuestions.length;
+  scoreEl.textContent = score;
+
+  startScreen.classList.add('hidden');
+  leaderboardScreen.classList.add('hidden');
+  allQuestionsScreen.classList.add('hidden');
+  resultScreen.classList.add('hidden');
+  quizScreen.classList.remove('hidden');
+
+  showQuestion();
+  startTimer();
+}
+
+function showQuestion() {
+  const q = quizQuestions[currentIndex];
+  qIndexEl.textContent = currentIndex + 1;
+  questionEl.textContent = q.q;
+  choicesEl.innerHTML = '';
+
+  q.choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'w-full text-left px-4 py-3 border rounded-lg hover:shadow transition focus:outline-none';
+    btn.innerHTML = `<span class=\\"block\\">${choice}</span>`;
+    btn.addEventListener('click', () => selectAnswer(i));
+
+    if (userAnswers[currentIndex] === i) {
+      btn.classList.add('bg-green-50','border-green-400');
+    }
+
+    choicesEl.appendChild(btn);
+  });
+
+  btnPrev.disabled = currentIndex === 0;
+  btnNext.disabled = currentIndex === quizQuestions.length - 1;
+}
+
+function selectAnswer(choiceIndex) {
+  const q = quizQuestions[currentIndex];
+  if (userAnswers[currentIndex] != null) {
+    if (userAnswers[currentIndex] === q.answer) score -= 1;
+  }
+
+  userAnswers[currentIndex] = choiceIndex;
+  if (choiceIndex === q.answer) score += 1;
+  scoreEl.textContent = score;
+
+  Array.from(choicesEl.children).forEach((child, i) => {
+    child.classList.remove('bg-green-50','border-green-400');
+    if (i === choiceIndex) child.classList.add('bg-green-50','border-green-400');
+  });
+}
+
+function nextQuestion() {
+  if (currentIndex < quizQuestions.length - 1) {
+    currentIndex++;
+    timeLeft = timePerQuestion;
+    showQuestion();
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    timeLeft = timePerQuestion;
+    showQuestion();
+  }
+}
+
+function finishQuiz() {
+  stopTimer();
+  quizScreen.classList.add('hidden');
+  resultScreen.classList.remove('hidden');
+  finalScoreEl.textContent = score;
+  maxScoreEl.textContent = quizQuestions.length;
+}
+
+// ---------------------- Timer ----------------------
+function startTimer() {
+  timeLeft = timePerQuestion;
+  timeLeftEl.textContent = timeLeft;
+  stopTimer();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timeLeftEl.textContent = timeLeft;
+    if (timeLeft <= 0) {
+      if (currentIndex < quizQuestions.length - 1) {
+        currentIndex++;
+        timeLeft = timePerQuestion;
+        showQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+  }, 1000);
+}
+function stopTimer(){ if (timerInterval) clearInterval(timerInterval); timerInterval = null; }
+
+// ---------------------- Leaderboard & All Questions ----------------------
+function showLeaderboard() {
+  startScreen.classList.add('hidden');
+  quizScreen.classList.add('hidden');
+  resultScreen.classList.add('hidden');
+  allQuestionsScreen.classList.add('hidden');
+  leaderboardScreen.classList.remove('hidden');
+  leaderboardList.innerHTML = '';
+  const data = loadLeaderboard();
+  if (data.length === 0) {
+    leaderboardList.innerHTML = '<li class="text-gray-500">No scores yet.</li>';
+    return;
+  }
+  data.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'flex justify-between items-center';
+    li.innerHTML = `<span>${escapeHtml(item.name)}</span><span class=\\"font-medium\\">${item.score}</span>`;
+    leaderboardList.appendChild(li);
+  });
+}
+
+function showAllQuestions() {
+  startScreen.classList.add('hidden');
+  quizScreen.classList.add('hidden');
+  resultScreen.classList.add('hidden');
+  leaderboardScreen.classList.add('hidden');
+  allQuestionsScreen.classList.remove('hidden');
+  allQuestionsList.innerHTML = '';
+  masterQuestions.forEach((q,i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${escapeHtml(q.q)}</strong><div class=\\"text-sm text-gray-600\\">${q.choices.map((c,idx)=> `${idx+1}. ${escapeHtml(c)}`).join(' &nbsp; ')}</div>`;
+    allQuestionsList.appendChild(li);
+  });
+}
+
+// ---------------------- Events ----------------------
+btnStart.addEventListener('click', startQuiz);
+btnLeaderboard.addEventListener('click', showLeaderboard);
+btnShowAll.addEventListener('click', showAllQuestions);
+btnPrev.addEventListener('click', prevQuestion);
+btnNext.addEventListener('click', nextQuestion);
+btnFinish.addEventListener('click', finishQuiz);
+btnBack.addEventListener('click', () => { leaderboardScreen.classList.add('hidden'); startScreen.classList.remove('hidden'); });
+btnClearLeaderboard.addEventListener('click', () => { if(confirm('Clear leaderboard?')){ localStorage.removeItem('quickquiz_leaderboard'); showLeaderboard(); }});
+
+btnSaveScore.addEventListener('click', () => {
+  const name = nameInput.value.trim() || 'Anonymous';
+  saveLeaderboard({ name, score });
+  alert('Saved!');
+  showLeaderboard();
+});
+
+btnRestart.addEventListener('click', () => { resultScreen.classList.add('hidden'); startQuiz(); });
+btnHome.addEventListener('click', () => { resultScreen.classList.add('hidden'); startScreen.classList.remove('hidden'); });
+btnAllBack.addEventListener('click', () => { allQuestionsScreen.classList.add('hidden'); startScreen.classList.remove('hidden'); });
+
+// ---------------------- Init ----------------------
+(function init(){
+  qCountEl.textContent = 10;
+  timeLeftEl.textContent = timePerQuestion;
+  scoreEl.textContent = score;
+})();
+</script>
+</body>
+</html>

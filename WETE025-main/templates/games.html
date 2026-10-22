@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Games</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-green-100 min-h-screen flex flex-col items-center py-10">
+
+  
+  <h1 class="text-4xl font-bold mb-10 text-green-800">🎮 Play & Learn - Eco Games</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <!-- Snake Game -->
+    <div class="bg-black shadow-xl rounded-2xl p-6 flex flex-col items-center hover:scale-105 transition duration-300">
+        <img src="{{ url_for('static', filename='images/waste.png') }}" alt="Snake Game" class="w-64 h-64 object-cover rounded-xl mb-4 border-2 border-green-200">
+        <h2 class="text-2xl font-semibold mb-4 text-green-700">Waste Sorting </h2>
+        <a href="{{ url_for('waste_sorting') }}" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Play waste sorting</a>
+    </div>
+
+    <!-- Quiz Game -->
+    <div class="bg-black shadow-xl rounded-2xl p-6 flex flex-col items-center hover:scale-105 transition duration-300">
+        <img src="https://cdn-icons-png.flaticon.com/512/4336/4336384.png" alt="Quiz Game" class="w-64 h-64 object-cover rounded-xl mb-4 border-2 border-blue-200">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-700">Quiz Challenge</h2>
+        <a href="{{ url_for('quiz') }}" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Play Quiz</a>
+    </div>
+</div>
+
+  <a href="{{ url_for('index') }}" class="mt-12 text-gray-700 hover:text-gray-900 underline">← Back to home</a>
+
+</body>
+</html>
